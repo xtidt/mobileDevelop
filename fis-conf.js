@@ -12,21 +12,8 @@ fis.match('**.less', {
     useSprite: true
 });
 
-// 启用 fis-spriter-csssprites 插件
-fis.match('::package', {
-    spriter: fis.plugin('csssprites', {
-        scale: 0.5
-    })
-});
-
 fis.match('**/_*.scss', {
     release: false
-});
-
-// mock数据需要在根路径下
-// mock proxy注意不要匹配query，因为fis3-server-node会默认添加query
-fis.match('mock/**', {
-    release: '$0'
 });
 
 fis.match('js/**.es6', {
