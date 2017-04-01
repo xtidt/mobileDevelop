@@ -6,11 +6,6 @@ let loopFn = () => {
     } else {}
 };
 
-// document.getElementById('inputTarget').addEventListener('click', function() {
-//     var inputTextBox = document.getElementById('speakBottom');
-//     setTimeout(loopFn, timeout);
-// }, true);
-
 {
     $(document).on('click', '#inputTarget', function() {
         setTimeout(loopFn, timeout);
