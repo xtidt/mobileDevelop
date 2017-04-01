@@ -19,12 +19,6 @@ fis.match('::package', {
     })
 });
 
-// fis要求要么不设置deploy，要么所有文件都设置deploy
-fis.match('**', {
-    release: 'basic-game/$0'
-});
-
-
 fis.match('**/_*.scss', {
     release: false
 });
