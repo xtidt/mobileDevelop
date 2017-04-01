@@ -6,12 +6,16 @@ let loopFn = () => {
     } else {}
 };
 
-document.getElementById('inputTarget').addEventListener('click', function() {
-    var inputTextBox = document.getElementById('speakBottom');
-    setTimeout(loopFn, timeout);
-}, true);
+// document.getElementById('inputTarget').addEventListener('click', function() {
+//     var inputTextBox = document.getElementById('speakBottom');
+//     setTimeout(loopFn, timeout);
+// }, true);
 
-
+{
+    $(document).on('click', '#inputTarget', function() {
+        setTimeout(loopFn, timeout);
+    })
+}
 
 
 //判断元素是否在想要的区域，不在的话返回position；这段代码依赖zepto
