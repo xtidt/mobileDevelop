@@ -1,13 +1,17 @@
+const timeout = 200;
+let loopFn = () => {
+    if (!!$('#inputTarget').notInView(1)) {
+        $(window).scrollTop(10000);
+        setTimeout(loopFn, timeout);
+    } else {}
+};
+
 document.getElementById('inputTarget').addEventListener('click', function() {
     var inputTextBox = document.getElementById('speakBottom');
-    setInterval(function() {
-        $('#inputTarget').notInView(1);
-
-        $(window).scrollTop(10000);
-
-        alert(1111);
-    }, 1000)
+    setTimeout(loopFn, timeout);
 }, true);
+
+
 
 
 //判断元素是否在想要的区域，不在的话返回position；这段代码依赖zepto
