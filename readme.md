@@ -1,0 +1,91 @@
+# 微信开发input输入框被键盘遮挡
+
+## 问题描述：
+修复 H5 web 移动端 input 底部fixed定位 键盘弹出时失效错位；以及普通 input 获取焦点后被弹出键盘挡住；包括：
+
+1. H5 web 移动端 input 底部fixed定位 键盘弹出时失效错位；
+2. 有第三方输入法的ios机还会出现键盘弹出延迟，导致普通布局 input/textarea 位置靠下的被键盘挡住；
+
+## 解决思路
+
+* 问题1网上大部分的解决办法是将页面高度固定，不让页面整体滚动，绝对布局滚动内容，局部滚动。
+
+* 这个方法带来的问题是：
+
+* 安卓机上局部滚动不流畅，滚动条卡顿，可通过第三方插件 iScroll 解决流畅问题；
+
+* ios机上可以通过 ```-webkit-overflow-scrolling: touch; ```属性解决不流畅的问题；
+
+* 而且问题是所有的fixed布局均失效，所有解决方案要考虑到不的不仅仅是底部fixed；
+
+* 我的解决思路是获取焦点的时候先判断绝对布局的元素是否在想要的位置，不在的话在通过css位移到想要的位置。
+
+* 这个解决办法也可以解决问题2出现的状况，但对普通布局是将整个页面滚动到合适的位置，而且对应第三方的输入法需要延迟1ms判断并定位。
+
+* 以上的解决方法可以不用设置绝对布局局部滚动，但是页面滚动时候fixed还是失效的，元素会跟着页面滚动，这时候可以页面滚动时候动态判断（有延迟）；
+
+* 最新了解的一个方法，整体页面布局不用fixed，用 flex 将底部和主题内容看成量块，flex 纵向布局 flex-direction: column ，主内容 flex:1 ; 这样无论是安卓和ios在底部 input focus 的时候定位都没问题，也不需要js定位，页面滚动底部的模块也不会跟随，但是在有输入法的时候部分手机(iphone5c)有问题，剩下的就是解决滚动平滑的问题。
+
+
+## 相应代码：
+
+```
+//判断元素是否在想要的区域，不在的话返回position；这段代码依赖zepto
+$.fn.notInView = function(perc) {
+    perc = perc || 0;
+
+    var pos = this[0].getBoundingClientRect(), 
+        // getBoundingClientRect 是获取定位的，很怪异
+        // top: 元素顶部到窗口（可是区域）顶部
+        // bottom: 元素底部到窗口顶部
+        // left: 元素左侧到窗口左侧
+        // right: 元素右侧到窗口左侧
+        // width/height 元素宽高
+
+        $window = $(window),
+        view = {
+            height: $window.height(), /
+            width: $window.width()
+        },
+        minTop = perc * ( view.height - pos.height ); 
+        //最小距离，判断元素是否在想要的位置
+
+    if (pos.top < minTop || pos.top > view.height || pos.left < 0 || pos.left > view.width) {
+        pos.viewHeight = view.height;
+        pos.viewWidth = view.width;
+        return pos;
+    }
+    return false;
+}
+//将元素移动到指定位置 perc百分比布局，0是顶部，1是底部
+$.fn.moveToView = function(perc) { //百分比
+    var type = this.css('position');
+    //普通布局之外的将整个页面滚动到指定位置
+    if( type !== 'fixed' ) { 
+        var pos = this.notInView(perc);
+        if (pos) {
+            var $window = $(window),
+                oldScrollY = $window.scrollTop(),
+                scrollY = oldScrollY + pos.top - perc * ( pos.viewHeight - pos.height ); 
+
+            $(window).scrollTop(scrollY);
+        };
+    } 
+    //fixed 布局处理
+    else {
+        this.css({
+            'transform': 'translate3d(0, 0, 0)',
+            '-webkit-transform': 'translate3d(0, 0, 0)'
+        });
+        var pos = this.notInView(perc);
+        if (pos) {
+            perc = perc || 0;
+            var y = perc *( pos.viewHeight - pos.height ) - pos.top;
+            this.css({
+                'transform': 'translate3d(0, '+ y +'px, 0)',
+                '-webkit-transform': 'translate3d(0, '+ y +'px, 0)'
+            });
+        }
+    }
+}
+```
