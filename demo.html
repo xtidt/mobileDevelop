@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>comment</title>
+    <link rel="shortcut icon" href="/img/favicon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+    <script src="http://play.yunkai.com/static/jquery/1.9.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <style>
+        html {
+            height: 100%;
+        }
+        
+        body {
+            height: 100%;
+            line-height: 1;
+            font-family: "微软雅黑";
+            background-color: #fff;
+            font-size: 12px;
+            color: #5d5b5b;
+            min-width: 320px;
+            margin: 0 auto;
+            display: block;
+            position: relative;
+            overflow-y: hidden;
+        }
+        
+        .flex-body {
+            position: absolute;
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: vertical;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            -webkit-flex-direction: column;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+        
+        .flex-main {
+            position: relative;
+            height: 100%;
+            width: 100%;
+            -webkit-box-flex: 1;
+            -ms-flex: 1;
+            -webkit-flex: 1;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .speakBottom {
+            position: absolute;
+            z-index: 4;
+            width: 100%;
+            bottom: -1px;
+            box-shadow: 0 0 4px #ccc;
+            height: 60px;
+            flex-shrink: 0;
+            background: blue;
+        }
+        
+        .wrap {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overflow-y: scroll;
+            background: green;
+            -webkit-overflow-scrolling: touch;
+            position: absolute;
+        }
+        
+        .wrap {
+            height: 100%;
+        }
+        
+        .wrap li {
+            height: 100px;
+            border-bottom: 1px solid black;
+        }
+        
+        .box {
+            position: absolute;
+            bottom: 60px;
+            width: 100%;
+        }
+        
+        .box input {
+            margin: 0 auto;
+            width: 90%;
+            height: 30px;
+        }
+        
+        .cmtbox-wrapper-transform {
+            transform: translate3d(0, 0, 0);
+        }
+    </style>
+    <div class="flex-body" id="app">
+        <div class="flex-main">
+            <div class="wrap">
+                <li>1</li>
+                <li>1</li>
+                <li>1</li>
+                <li>1</li>
+                <li>1</li>
+                <li>1</li>
+                <li>1</li>
+                <li>1</li>
+                <li>1</li>
+                <li>1</li>
+                <li>1</li>
+                <li>1</li>
+                <li>1</li>
+                <li>1</li>
+                <li>1</li>
+                <li>1</li>
+            </div>
+        </div>
+
+        <div class="speakBottom">
+            <form onsubmit="return false;">
+                <input type="text" id="inputTarget">
+            </form>
+        </div>
+    </div>
+
+
+
+    <script>
+        document.getElementById('inputTarget').addEventListener('click', function() {
+            var inputTextBox = document.getElementById('speakBottom');
+            setInterval(function() {
+                $('#inputTarget').notInView(1);
+
+                $(window).scrollTop(10000);
+            }, 200)
+        }, true);
+
+
+        //判断元素是否在想要的区域，不在的话返回position；这段代码依赖zepto
+        $.fn.notInView = function(perc) {
+                perc = perc || 0;
+
+                var pos = this[0].getBoundingClientRect(),
+                    // getBoundingClientRect 是获取定位的，很怪异
+                    // top: 元素顶部到窗口（可是区域）顶部
+                    // bottom: 元素底部到窗口顶部
+                    // left: 元素左侧到窗口左侧
+                    // right: 元素右侧到窗口左侧
+                    // width/height 元素宽高
+
+                    $window = $(window),
+                    view = {
+                        height: $window.height(), //
+                        width: $window.width()
+                    },
+                    minTop = perc * (view.height - pos.height);
+                //最小距离，判断元素是否在想要的位置
+
+                if (pos.top < minTop || pos.top > view.height || pos.left < 0 || pos.left > view.width) {
+                    pos.viewHeight = view.height;
+                    pos.viewWidth = view.width;
+                    return pos;
+                }
+                return false;
+            }
+            //将元素移动到指定位置 perc百分比布局，0是顶部，1是底部
+        $.fn.moveToView = function(perc) { //百分比
+            var type = this.css('position');
+            //普通布局之外的将整个页面滚动到指定位置
+            if (type !== 'fixed') {
+                var pos = this.notInView(perc);
+                if (pos) {
+                    var $window = $(window),
+                        oldScrollY = $window.scrollTop(),
+                        scrollY = oldScrollY + pos.top - perc * (pos.viewHeight - pos.height);
+
+                    $(window).scrollTop(scrollY);
+                };
+            }
+            //fixed 布局处理
+            else {
+                this.css({
+                    'transform': 'translate3d(0, 0, 0)',
+                    '-webkit-transform': 'translate3d(0, 0, 0)'
+                });
+                var pos = this.notInView(perc);
+                if (pos) {
+                    perc = perc || 0;
+                    var y = perc * (pos.viewHeight - pos.height) - pos.top;
+                    this.css({
+                        'transform': 'translate3d(0, ' + y + 'px, 0)',
+                        '-webkit-transform': 'translate3d(0, ' + y + 'px, 0)'
+                    });
+                }
+            }
+        }
+    </script>
+</body>

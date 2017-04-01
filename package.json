@@ -1,0 +1,19 @@
+{
+  "name": "tony",
+  "version": "1.0.0",
+  "description": "iosScrollBug",
+  "main": "fis-conf.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "\u0016\u001b[2~https://github.com/xtidt/mobileDevelop.git"
+  },
+  "keywords": [
+    "wechat",
+    "develop"
+  ],
+  "author": "tony",
+  "license": "ISC"
+}
